@@ -1,0 +1,6 @@
+[project]
+name = "epd-beregner"
+version = "0.1.0"
+
+[tool.streamlit]
+pythonVersion = "3.11"

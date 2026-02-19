@@ -125,10 +125,10 @@ if st.button("Beregn"):
 
     st.subheader("Resultat (kgCO₂e / m²)")
 
-st.dataframe(
-    result_df.style.format("{:.3e}"),
-    use_container_width=True
-)
+    st.dataframe(
+        result_df.style.format("{:.3e}"),
+        use_container_width=True
+    )
 
 # ---------- SAMLET OPSUMMERING ----------
 

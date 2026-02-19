@@ -33,8 +33,9 @@ def beregn_lag(tykkelse_m, materiale):
 
 # ---------- GUI ----------
 
-st.title("LCA beregner")
-
+st.title("MBE's LCA beregner")
+st.write("Angiv værdier herunder og få et estimat på værdier, som MBE kan levere")
+st.write("For at få præcise værdier anbefales det altid at tage fat i MBE (ki@midtjydskbeton.dk) ")
 længde = st.number_input("Længde (m)", value=1.0)
 højde = st.number_input("Højde (m)", value=1.0)
 
@@ -137,9 +138,10 @@ if st.button("Beregn"):
 
     st.markdown("---")
 
-    st.write(
-        f"Der er regnet med transportafstand til byggeplads på "
-        f"**{afstand:.1f} km**, en samlet belastning på "
-        f"**{samlet_belastning:.3e} kg CO₂e/m²**, "
-        f"og en samlet tykkelse på **{samlet_tykkelse_m:.3f} m**."
+    st.write(f"Der er regnet med transportafstand til byggeplads på "
+        {afstand:.1f} " km")
+    st.write(f"En samlet CO2 belastning på "
+        {samlet_belastning:.3e} " kg CO₂e/m²")
+    st.write(f"og en samlet tykkelse på " {samlet_tykkelse_m:.3f} " .")
+        
     )

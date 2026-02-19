@@ -3,6 +3,8 @@
 # ---------- LOAD EXCEL ----------
 import streamlit as st
 import pandas as pd
+import openpyxl
+st.write("openpyxl loaded")
 
 @st.cache_data
 def load_data():

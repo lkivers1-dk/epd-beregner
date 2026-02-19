@@ -124,4 +124,29 @@ if st.button("Beregn"):
     # ---------- DISPLAY ----------
 
     st.subheader("Resultat (kgCO₂e / m²)")
-    st.dataframe(result_df.round(3), use_container_width=True)
+
+st.dataframe(
+    result_df.style.format("{:.3e}"),
+    use_container_width=True
+)
+
+# ---------- SAMLET OPSUMMERING ----------
+
+# samlet tykkelse i meter
+samlet_tykkelse = (t_iso + t_for + t_bag) / 1000  # mm → m
+
+# samlet belastning (sidste række = TOTAL)
+samlet_belastning = result_df.iloc[-1]["Total"]
+
+# hvis du stadig beregner volumen til transport:
+samlet_volumen = areal * samlet_tykkelse
+totalvægt = samlet_volumen  # her = m3 (da du ikke bruger densitet)
+
+st.markdown("---")
+
+st.write(
+    f"Der er regnet med transportafstand til byggeplads på "
+    f"**{afstand:.1f} km**, en totalvægt på **{totalvægt:.3f} m³**, "
+    f"en samlet belastning på **{samlet_belastning:.3e} kg CO₂e/m²**, "
+    f"og en samlet tykkelse på **{samlet_tykkelse:.3f} m**."
+)

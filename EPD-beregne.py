@@ -1,12 +1,20 @@
 # -*- coding: utf-8 -*-
-import streamlit as st
-import pandas as pd
-import openpyxl
 
 # ---------- LOAD EXCEL ----------
-df = pd.read_excel("materialedata.xlsx", header=3)
+import streamlit as st
+import pandas as pd
 
-df.columns = df.columns.str.strip()
+@st.cache_data
+def load_data():
+    try:
+        df = pd.read_excel("materialedata.xlsx", header=3, engine="openpyxl")
+        df.columns = df.columns.str.strip()
+        return df
+    except Exception as e:
+        st.error(f"Fejl ved indlæsning af Excel: {e}")
+        st.stop()
+
+df = load_data()
 
 materialer = df["Materiale"].tolist()
 

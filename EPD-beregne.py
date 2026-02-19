@@ -53,9 +53,9 @@ if st.button("Beregn"):
 
     areal = længde * højde
 
-    res_iso = beregn_lag(t_iso 1000 /, mat_iso)
-    res_for = beregn_lag(t_for 1000 /, mat_for)
-    res_bag = beregn_lag(t_bag 1000 /, mat_bag)
+    res_iso = beregn_lag(t_iso/1000 , mat_iso)
+    res_for = beregn_lag(t_for/1000 , mat_for)
+    res_bag = beregn_lag(t_bag/1000 , mat_bag)
 
     moduler = ["A1","A2","A3","A4","C1","C2","C3","C4","D"]
 

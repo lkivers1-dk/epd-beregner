@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import streamlit as st
 import pandas as pd
+import openpyxl
 
 # ---------- LOAD EXCEL ----------
 df = pd.read_excel("materialedata.xlsx", header=3)

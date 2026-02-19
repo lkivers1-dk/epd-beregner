@@ -87,7 +87,7 @@ if st.button("Beregn"):
     transport_factor = get_value("Transport", "A4")
 
     # Her bruges areal * samlet tykkelse som "m3"
-    samlet_tykkelse = t_iso + t_for + t_bag
+    samlet_tykkelse = t_iso/1000 + t_for/1000 + t_bag/1000
     volumen = areal * samlet_tykkelse
 
     # Hvis Excel transportfaktor er pr m3/km:

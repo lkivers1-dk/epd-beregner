@@ -10,7 +10,7 @@ def load_data():
 
 df = load_data()
 
-materialer = [m for m in df["Materiale"].tolist() if m != "Transport"]
+materialer = [m for m in df["Materiale"].tolist()]
 
 # ---------- FUNCTIONS ----------
 

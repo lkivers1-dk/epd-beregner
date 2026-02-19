@@ -10,22 +10,24 @@ def load_data():
 
 df = load_data()
 
-materialer = [m for m in df["Materiale"].tolist()]
+materialer = df["Materiale"].tolist()
 
 # ---------- FUNCTIONS ----------
 
 def get_value(materiale, kolonne):
-    return df[df["Materiale"] == materiale][kolonne].values[0]
+    match = df[df["Materiale"].str.strip().str.lower() 
+               == materiale.strip().lower()]
+    if match.empty:
+        st.error(f"Materiale '{materiale}' findes ikke i Excel")
+        st.stop()
+    return match[kolonne].values[0]
 
 
-def beregn_lag(tykkelse, materiale):
-
+def beregn_lag(tykkelse_m, materiale):
     result = {}
-
     for modul in ["A1","A2","A3","A4","C1","C2","C3","C4","D"]:
         faktor = get_value(materiale, modul)
-        result[modul] = tykkelse * faktor  # kgCO2e/m2
-
+        result[modul] = tykkelse_m * faktor  # kgCO2e/m2
     return result
 
 
@@ -53,9 +55,14 @@ if st.button("Beregn"):
 
     areal = længde * højde
 
-    res_iso = beregn_lag(t_iso/1000 , mat_iso)
-    res_for = beregn_lag(t_for/1000 , mat_for)
-    res_bag = beregn_lag(t_bag/1000 , mat_bag)
+    # tykkelser i meter
+    t_iso_m = t_iso / 1000
+    t_for_m = t_for / 1000
+    t_bag_m = t_bag / 1000
+
+    res_iso = beregn_lag(t_iso_m, mat_iso)
+    res_for = beregn_lag(t_for_m, mat_for)
+    res_bag = beregn_lag(t_bag_m, mat_bag)
 
     moduler = ["A1","A2","A3","A4","C1","C2","C3","C4","D"]
 
@@ -78,21 +85,14 @@ if st.button("Beregn"):
 
     result_df["Total"] = result_df[moduler].sum(axis=1)
 
-    # ---------- TRANSPORT ----------
-
-    # Hvis transport stadig skal beregnes på ton:
-    # Her antager vi at transportfaktor er kgCO2e/ton/km
-    # og at du manuelt kender elementets ton (ellers kræver densitet)
+    # ---------- TRANSPORT (SELVSTÆNDIG LINJE) ----------
 
     transport_factor = get_value("Transport", "A4")
 
-    # Her bruges areal * samlet tykkelse som "m3"
-    samlet_tykkelse = t_iso/1000 + t_for/1000 + t_bag/1000
-    volumen = areal * samlet_tykkelse
+    samlet_tykkelse_m = t_iso_m + t_for_m + t_bag_m
+    volumen = areal * samlet_tykkelse_m  # m3
 
-    # Hvis Excel transportfaktor er pr m3/km:
     transport_co2 = volumen * afstand * transport_factor
-
     transport_pr_m2 = transport_co2 / areal
 
     transport_row = pd.DataFrame([{
@@ -125,28 +125,21 @@ if st.button("Beregn"):
 
     st.subheader("Resultat (kgCO₂e / m²)")
 
-    st.dataframe(
-        result_df.style.format("{:.3e}"),
-        use_container_width=True
+    formatted_df = result_df.style.format(
+        {col: "{:.3e}" for col in result_df.columns if col != "Materiale"}
     )
 
-# ---------- SAMLET OPSUMMERING ----------
+    st.dataframe(formatted_df, use_container_width=True)
 
-# samlet tykkelse i meter
-samlet_tykkelse = (t_iso + t_for + t_bag) / 1000  # mm → m
+    # ---------- SUMMARY TEXT ----------
 
-# samlet belastning (sidste række = TOTAL)
-samlet_belastning = result_df.iloc[-1]["Total"]
+    samlet_belastning = result_df.iloc[-1]["Total"]
 
-# hvis du stadig beregner volumen til transport:
-samlet_volumen = areal * samlet_tykkelse
-totalvægt = samlet_volumen  # her = m3 (da du ikke bruger densitet)
+    st.markdown("---")
 
-st.markdown("---")
-
-st.write(
-    f"Der er regnet med transportafstand til byggeplads på "
-    f"**{afstand:.1f} km**, en totalvægt på **{totalvægt:.3f} m³**, "
-    f"en samlet belastning på **{samlet_belastning:.3e} kg CO₂e/m²**, "
-    f"og en samlet tykkelse på **{samlet_tykkelse:.3f} m**."
-)
+    st.write(
+        f"Der er regnet med transportafstand til byggeplads på "
+        f"**{afstand:.1f} km**, en samlet belastning på "
+        f"**{samlet_belastning:.3e} kg CO₂e/m²**, "
+        f"og en samlet tykkelse på **{samlet_tykkelse_m:.3f} m**."
+    )

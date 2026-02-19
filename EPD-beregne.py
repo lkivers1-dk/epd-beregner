@@ -36,9 +36,9 @@ st.title("LCA beregner")
 længde = st.number_input("Længde (m)", value=1.0)
 højde = st.number_input("Højde (m)", value=1.0)
 
-t_iso = st.number_input("Tykkelse isolering (m)", value=0.2)
-t_for = st.number_input("Tykkelse forplade (m)", value=0.07)
-t_bag = st.number_input("Tykkelse bagplade (m)", value=0.07)
+t_iso = st.number_input("Tykkelse isolering (mm)", value=200)
+t_for = st.number_input("Tykkelse forplade (mm)", value=70)
+t_bag = st.number_input("Tykkelse bagplade (mm)", value=150)
 
 mat_iso = st.selectbox("Isolering", materialer)
 mat_for = st.selectbox("Forplade", materialer)
@@ -53,9 +53,9 @@ if st.button("Beregn"):
 
     areal = længde * højde
 
-    res_iso = beregn_lag(t_iso, mat_iso)
-    res_for = beregn_lag(t_for, mat_for)
-    res_bag = beregn_lag(t_bag, mat_bag)
+    res_iso = beregn_lag(t_iso 1000 /, mat_iso)
+    res_for = beregn_lag(t_for 1000 /, mat_for)
+    res_bag = beregn_lag(t_bag 1000 /, mat_bag)
 
     moduler = ["A1","A2","A3","A4","C1","C2","C3","C4","D"]
 

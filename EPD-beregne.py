@@ -138,10 +138,8 @@ if st.button("Beregn"):
 
     st.markdown("---")
 
-    st.write(f"Der er regnet med transportafstand til byggeplads på "
-        {afstand:.1f} " km")
-    st.write(f"En samlet CO2 belastning på "
-        {samlet_belastning:.3e} " kg CO₂e/m²")
-    st.write(f"og en samlet tykkelse på " {samlet_tykkelse_m:.3f} " .")
+    st.write(f"Der er regnet med transportafstand til byggeplads på {afstand:.1f} km")
+    st.write(f"En samlet CO2 belastning på {samlet_belastning:.3e} kg CO₂e/m²")
+    st.write(f"og en samlet tykkelse på {samlet_tykkelse_m:.3f}.")
         
-    )
+    

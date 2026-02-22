@@ -2,6 +2,10 @@ import streamlit as st
 import pandas as pd
 import random
 import json
+import uuid
+
+def generate_id():
+    return str(uuid.uuid4()).upper()
 
 # ---------- LOAD DATA ----------
 @st.cache_data
@@ -167,253 +171,156 @@ if st.button("Beregn"):
     st.write(f"Der er regnet med transportafstand til byggeplads på {afstand:.1f} km")
     st.write(f"En samlet CO2 belastning på {float(samlet_belastning):.2f} kg CO₂e/m²")
     st.write(f"og en samlet tykkelse på {round(1000 * samlet_tykkelse_m)} mm.")
-        
-  
-#Lav en LCAByg fil i JSON
 
+    # ==============================
+# LCAByg JSON GENERATOR
+# ==============================
 
-# Indsæt din JSON-data her som Python-objekt
+# ---- Generér IDs ----
+produkt_ID = generate_id()
 
-produkt_ID = guid
-ProductToStage_ID = guid
-ProductToStage_A1A3_ID = guid
-ProductToStage_C3_ID = guid
-ProductToStage_C4_ID = guid
-ProductToStage_D_ID = guid
-CTStage_A1A3_ID = guid
-CTStage_C3_ID = guid
-CTStage_C4_ID = guid
-CTStage_D_ID = guid
-Stage_A1A3_ID = guid
-Stage_C3_ID = guid
-Stage_C4_ID = guid
-Stage_D_ID = guid
+stage_ids = {
+    "A1to3": generate_id(),
+    "C3": generate_id(),
+    "C4": generate_id(),
+    "D": generate_id()
+}
 
-data = [
-    {
-        "Node": {
-            "Product": {
-                "id": "{produkt_ID},"
-                "name": {
-                    "English": "Project MBE from midtjydskbeton.dk {samlet_tykkelse_m}",
-                    "German": "",
-                    "Norwegian": "",
-                    "Danish": "Projekt MBE fra midtjydskbeton.dk {samlet_tykkelse_m}"
-                },
-                "source": "User",
-                "comment": {
-                    "English": "",
-                    "Norwegian": "",
-                    "German": "",
-                    "Danish": ""
-                },
-                "uncertainty_factor": 1.0
-            }
+edge_ids = {
+    stage: generate_id()
+    for stage in stage_ids
+}
+
+category_to_stage_ids = {
+    stage: generate_id()
+    for stage in stage_ids
+}
+
+# ---- Udtræk summer fra TOTAL-rækken ----
+total_row = result_df[result_df["Materiale"] == "TOTAL"].iloc[0]
+
+gwp_A1A3 = total_row["A1"] + total_row["A2"] + total_row["A3"]
+gwp_C3 = total_row["C3"]
+gwp_C4 = total_row["C4"]
+gwp_D = total_row["D"]
+
+samlet_tykkelse_mm = round(1000 * samlet_tykkelse_m)
+
+data = []
+
+# ------------------------
+# PRODUCT NODE
+# ------------------------
+
+data.append({
+    "Node": {
+        "Product": {
+            "id": produkt_ID,
+            "name": {
+                "English": f"MBE wall {samlet_tykkelse_mm}mm",
+                "German": "",
+                "Norwegian": "",
+                "Danish": f"MBE væg {samlet_tykkelse_mm}mm"
+            },
+            "source": "User",
+            "uncertainty_factor": 1.0
         }
     }
-    # resten af din struktur indsættes her
-    "Edge": [{"ProductToStage": { "id: {ProductToStage_ID}",
-"excluded_scenarios": [],
-"enabled": true}},
-"{produkt_ID}",
-"{Stage_A1A3_ID}]},"
-{"Edge": [{
-"ProductToStage": {
-"id": "{ProductToStage_A1A3_ID}",
-"excluded_scenarios": [],
-"enabled": true}},
-"{produkt_ID}",
-"{Stage_C3_ID}"]},
-{
-"Edge": [{
-"ProductToStage": {
-"id": "{ProductToStage_C3_ID}",
-"excluded_scenarios": [],
-"enabled": true}},
-"produkt_ID",
-"{Stage_C4_ID}"]},
-{
-"Edge": [{
-"ProductToStage": {"id": "{ProductToStage_C4_ID}",
-"excluded_scenarios": [],
-"enabled": true}},
-"{produkt_ID}",
-"{Stage_D_ID}"]
-},{
-"Node": {
-"Stage": {
-"id": "{Stage_A1A3_ID}",
-"name": {
-"Danish": "Projekt MBE fra midtjydskbeton.dk {samlet_tykkelse_m}  (A1-A3)","German":"","Norwegian":"","English": "Project MBE11 mar25 massive wall (A1-A3)"},
-"comment": {"English": "" ,"Norwegian":"" ,"German": "" ,"Danish": ""},
-"source": "User",
-"valid_to": "2029-02-20",
-"stage": "A1to3",
-"stage_unit": "M3",
-"indicator_unit": "M3",
-"stage_factor": 1.0,
-"mass_factor": 2439.72,
-"indicator_factor": 1.0,
-"scale_factor": 1.0,
-"external_source": "EPD Norge - Projekt",
-"external_id": "",
-"external_version": "",
-"external_url": "",
-"compliance": "A1",
-"data_type": "Specific",
-"indicators": {
-"POCP": 0.531441028823,
-"ADPE": 0.001770506245,
-"EP": 0.006020217105,
-"SENR": 0.0,
-"ADPF": 2069.89535450987,
-"PENR": 2070.0534874347,
-"PER": 1236.9975607484,
-"ODP": 0.000015025675,
-"AP": 0.787489711888,
-"SER": 0.0,
-"GWP": 236.625168967543
-}
-}
-}
-},{
-"Edge": [{
-"CategoryToStage": "{CTStage_A1A3_ID}"},
-"1389423d-f9f7-490d-94c7-2ff87bfb9203",
-"{Stage_A1A3_ID}"]
-},{
-"Node": {
-"Stage": {
-"id": "{Stage_C3_ID}",
-"name": {
-"Danish": "ProjektEPD MBE fra midtjydskbeton.dk {samlet_tykkelse_m} (C3)","German":"","Norwegian":"","English": "Project MBE11 mar25 massive wall (C3)" },
-"comment": {"English": "" ,"Norwegian":"" ,"German": "" ,"Danish": ""},
-"source": "User",
-"valid_to": "2029-02-20",
-"stage": "C3",
-"stage_unit": "M3",
-"indicator_unit": "M3",
-"stage_factor": 1.0,
-"mass_factor": 2439.72,
-"indicator_factor": 1.0,
-"scale_factor": 1.0,
-"external_source": "EPD Norge - Projekt",
-"external_id": "",
-"external_version": "",
-"external_url": "",
-"compliance": "A1",
-"data_type": "Specific",
-"indicators": {
-"POCP": 0.012424479175,
-"ADPE": 0.000020874376,
-"EP": 0.000103244629,
-"SENR": 0.0,
-"ADPF": 50.821330750170,
-"PENR": 32.583265716611,
-"PER": 26.034377546472,
-"ODP": 0.000000325257,
-"AP": 0.013611318627,
-"SER": 0.0,
-"GWP": 3.636997730553
-}
-}
-}
-},{
-"Edge": [{
-"CategoryToStage": "{CTStage_C3_ID}"},
-"1389423d-f9f7-490d-94c7-2ff87bfb9203",
-"{Stage_C3_ID}"]
-},{
-"Node": {
-"Stage": {
-"id": "{Stage_C4_ID}",
-"name": {
-"Danish": "ProjektEPD MBE fra midtjydskbeton.dk {samlet_tykkelse_m} (C4)","German":"","Norwegian":"","English": "Project MBE11 mar25 massive wall (C4)" },
-"comment": {"English": "" ,"Norwegian":"" ,"German": "" ,"Danish": ""},
-"source": "User",
-"valid_to": "2029-02-20",
-"stage": "C4",
-"stage_unit": "M3",
-"indicator_unit": "M3",
-"stage_factor": 1.0,
-"mass_factor": 2439.72,
-"indicator_factor": 1.0,
-"scale_factor": 1.0,
-"external_source": "EPD Norge - Projekt",
-"external_id": "",
-"external_version": "",
-"external_url": "",
-"compliance": "A1",
-"data_type": "Specific",
-"indicators": {
-"POCP": 0.003792120830,
-"ADPE": 0.000002909348,
-"EP": 0.000002454550,
-"SENR": 0.0,
-"ADPF": 10.607129148095,
-"PENR": 10.607378993499,
-"PER": 0.163277716803,
-"ODP": 0.000000160056,
-"AP": 0.003208205711,
-"SER": 0.0,
-"GWP": 0.329123956392
-}
-}
-}
-},{
-"Edge": [{
-"CategoryToStage": "{CTStage_C4_ID}"},
-"1389423d-f9f7-490d-94c7-2ff87bfb9203",
-"{Stage_C4_ID}"]
-},{
-"Node": {
-"Stage": {
-"id": "{Stage_D_ID}",
-"name": {
-"Danish": "ProjektEPD MBE fra midtjydskbeton.dk {samlet_tykkelse_m} (D)","German":"","Norwegian":"","English": "Project MBE11 mar25 massive wall (D)" },
-"comment": {"English": "" ,"Norwegian":"" ,"German": "" ,"Danish": ""},
-"source": "User",
-"valid_to": "2029-02-20",
-"stage": "D",
-"stage_unit": "M3",
-"indicator_unit": "M3",
-"stage_factor": 1.0,
-"mass_factor": 2439.72,
-"indicator_factor": 1.0,
-"scale_factor": 1.0,
-"external_source": "EPD Norge - Projekt",
-"external_id": "",
-"external_version": "",
-"external_url": "",
-"compliance": "A1",
-"data_type": "Specific",
-"indicators": {
-"POCP": -0.248621695542,
-"ADPE": -0.001138151800,
-"EP": -0.002579607721,
-"SENR": 0.0,
-"ADPF": -421.078645777261,
-"PENR": -425.735362042971,
-"PER": -57.276978086970,
-"ODP": -0.008239073372,
-"AP": -0.243562461584,
-"SER": 0.0,
-"GWP": -44.921155897105
-}
-}
-}
-},{
-"Edge": [{
-"CategoryToStage": "{CTStage_D_ID}"},
-"1389423d-f9f7-490d-94c7-2ff87bfb9203",
-"{Stage_D_ID}"]
-}]
-]
+})
 
-# Gem som txt-fil
-output_path = "epd_output.txt"
+# ------------------------
+# STAGE GENERATOR
+# ------------------------
 
-with open(output_path, "w", encoding="utf-8") as f:
-    json.dump(data, f, indent=4, ensure_ascii=False)
+stage_values = {
+    "A1to3": gwp_A1A3,
+    "C3": gwp_C3,
+    "C4": gwp_C4,
+    "D": gwp_D
+}
 
-print("Fil gemt:", output_path)
+for stage, gwp_value in stage_values.items():
+
+    # Stage node
+    data.append({
+        "Node": {
+            "Stage": {
+                "id": stage_ids[stage],
+                "name": {
+                    "English": f"MBE wall {samlet_tykkelse_mm}mm ({stage})",
+                    "German": "",
+                    "Norwegian": "",
+                    "Danish": f"MBE væg {samlet_tykkelse_mm}mm ({stage})"
+                },
+                "source": "User",
+                "valid_to": "2029-02-20",
+                "stage": stage,
+                "stage_unit": "M3",
+                "indicator_unit": "M3",
+                "stage_factor": 1.0,
+                "mass_factor": 2439.72,
+                "indicator_factor": 1.0,
+                "scale_factor": 1.0,
+                "external_source": "MBE Auto Generator",
+                "external_id": "",
+                "external_version": "",
+                "external_url": "",
+                "compliance": "A1",
+                "data_type": "Specific",
+                "indicators": {
+                    "GWP": float(gwp_value),
+                    "AP": 0.0,
+                    "EP": 0.0,
+                    "POCP": 0.0,
+                    "ADPE": 0.0,
+                    "ADPF": 0.0,
+                    "PENR": 0.0,
+                    "PER": 0.0,
+                    "ODP": 0.0,
+                    "SENR": 0.0,
+                    "SER": 0.0
+                }
+            }
+        }
+    })
+
+    # ProductToStage edge
+    data.append({
+        "Edge": [
+            {
+                "ProductToStage": {
+                    "id": edge_ids[stage],
+                    "excluded_scenarios": [],
+                    "enabled": True
+                }
+            },
+            produkt_ID,
+            stage_ids[stage]
+        ]
+    })
+
+    # CategoryToStage edge (standard kategori-id beholdt)
+    data.append({
+        "Edge": [
+            {
+                "CategoryToStage": category_to_stage_ids[stage]
+            },
+            "1389423d-f9f7-490d-94c7-2ff87bfb9203",
+            stage_ids[stage]
+        ]
+    })
+
+# ------------------------
+# DOWNLOAD BUTTON
+# ------------------------
+
+json_string = json.dumps(data, indent=4, ensure_ascii=False)
+
+st.download_button(
+    label="Download LCAByg JSON",
+    data=json_string,
+    file_name=f"MBE_LCA_{samlet_tykkelse_mm}mm.txt",
+    mime="application/json"
+)
+        
+  

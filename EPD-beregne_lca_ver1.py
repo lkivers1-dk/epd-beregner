@@ -31,7 +31,7 @@ def get_value(materiale, kolonne):
 
 def beregn_lag(tykkelse_m, materiale):
     result = {}
-    for modul in ["A1-GWP","A2-GWP","A3-GWP","A4-GWP","C1-GWP","C2-GWP","C3-GWP","C4-GWP","D-GWP"]:
+    for modul in ["A1 - GWP","A2 - GWP","A3 - GWP","A4 - GWP","C1 - GWP","C2 - GWP","C3 - GWP","C4 - GWP","D - GWP"]:
         faktor = get_value(materiale, modul)
         result[modul] = tykkelse_m * faktor  # kgCO2e/m2
     return result
@@ -86,7 +86,7 @@ if st.button("Beregn"):
     res_for = beregn_lag(t_for_m, mat_for)
     res_bag = beregn_lag(t_bag_m, mat_bag)
 
-    moduler = ["A1-GWP","A2-GWP","A3-GWP","A4-GWP","C1-GWP","C2-GWP","C3-GWP","C4-GWP","D-GWP"]
+    moduler = ["A1 - GWP","A2 - GWP","A3 - GWP","A4 - GWP","C1 - GWP","C2 - GWP","C3 - GWP","C4 - GWP","D - GWP"]
 
     # ---------- MATERIAL TABLE ----------
 
@@ -109,7 +109,7 @@ if st.button("Beregn"):
 
     # ---------- TRANSPORT (SELVSTÆNDIG LINJE) ----------
 
-    transport_factor = get_value("Transport", "A4-GWP")
+    transport_factor = get_value("Transport", "A4 - GWP")
 
     samlet_tykkelse_m = t_iso_m + t_for_m + t_bag_m
     volumen = areal * samlet_tykkelse_m  # m3

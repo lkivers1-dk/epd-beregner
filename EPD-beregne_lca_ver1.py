@@ -36,15 +36,6 @@ def beregn_lag(tykkelse_m, materiale):
         result[modul] = tykkelse_m * faktor  # kgCO2e/m2
     return result
 
-#Værdier hentes til generering af LCAByg-fil
-#def beregn_lca(materiale):
-#    result = {}
-#    for modlca in ["A1","A2","A3","A4","C1","C2","C3","C4","D"]:
-#        faktor = get_value(materiale, modlca)
-#        result[modlca] = faktor  # kgCO2e/m2
-#    return result
-
-
 
 def excel_guid():
     def rand_hex(max_value, length):
@@ -95,7 +86,7 @@ if st.button("Beregn"):
     res_for = beregn_lag(t_for_m, mat_for)
     res_bag = beregn_lag(t_bag_m, mat_bag)
 
-    moduler = ["A1","A2","A3","A4","C1","C2","C3","C4","D"]
+    moduler = ["A1-GWP","A2-GWP","A3-GWP","A4-GWP","C1-GWP","C2-GWP","C3-GWP","C4-GWP","D-GWP"]
 
     # ---------- MATERIAL TABLE ----------
 
@@ -118,7 +109,7 @@ if st.button("Beregn"):
 
     # ---------- TRANSPORT (SELVSTÆNDIG LINJE) ----------
 
-    transport_factor = get_value("Transport", "A4")
+    transport_factor = get_value("Transport", "A4-GWP")
 
     samlet_tykkelse_m = t_iso_m + t_for_m + t_bag_m
     volumen = areal * samlet_tykkelse_m  # m3

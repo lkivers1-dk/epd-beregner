@@ -173,154 +173,154 @@ if st.button("Beregn"):
     st.write(f"og en samlet tykkelse på {round(1000 * samlet_tykkelse_m)} mm.")
 
     # ==============================
-# LCAByg JSON GENERATOR
-# ==============================
+    # LCAByg JSON GENERATOR
+    # ==============================
 
-# ---- Generér IDs ----
-produkt_ID = generate_id()
+    # ---- Generér IDs ----
+    produkt_ID = generate_id()
 
-stage_ids = {
-    "A1to3": generate_id(),
-    "C3": generate_id(),
-    "C4": generate_id(),
-    "D": generate_id()
-}
-
-edge_ids = {
-    stage: generate_id()
-    for stage in stage_ids
-}
-
-category_to_stage_ids = {
-    stage: generate_id()
-    for stage in stage_ids
-}
-
-# ---- Udtræk summer fra TOTAL-rækken ----
-total_row = result_df[result_df["Materiale"] == "TOTAL"].iloc[0]
-
-gwp_A1A3 = total_row["A1"] + total_row["A2"] + total_row["A3"]
-gwp_C3 = total_row["C3"]
-gwp_C4 = total_row["C4"]
-gwp_D = total_row["D"]
-
-samlet_tykkelse_mm = round(1000 * samlet_tykkelse_m)
-
-data = []
-
-# ------------------------
-# PRODUCT NODE
-# ------------------------
-
-data.append({
-    "Node": {
-        "Product": {
-            "id": produkt_ID,
-            "name": {
-                "English": f"MBE wall {samlet_tykkelse_mm}mm",
-                "German": "",
-                "Norwegian": "",
-                "Danish": f"MBE væg {samlet_tykkelse_mm}mm"
-            },
-            "source": "User",
-            "uncertainty_factor": 1.0
+    stage_ids = {
+        "A1to3": generate_id(),
+        "C3": generate_id(),
+        "C4": generate_id(),
+        "D": generate_id()
         }
-    }
-})
+    
+    edge_ids = {
+        stage: generate_id()
+        for stage in stage_ids
+        }
 
-# ------------------------
-# STAGE GENERATOR
-# ------------------------
+    category_to_stage_ids = {
+        stage: generate_id()
+        for stage in stage_ids
+        }
 
-stage_values = {
-    "A1to3": gwp_A1A3,
-    "C3": gwp_C3,
-    "C4": gwp_C4,
-    "D": gwp_D
-}
+    # ---- Udtræk summer fra TOTAL-rækken ----
+    total_row = result_df[result_df["Materiale"] == "TOTAL"].iloc[0]
 
-for stage, gwp_value in stage_values.items():
-
-    # Stage node
+    gwp_A1A3 = total_row["A1"] + total_row["A2"] + total_row["A3"]
+    gwp_C3 = total_row["C3"]
+    gwp_C4 = total_row["C4"]
+    gwp_D = total_row["D"]
+    
+    samlet_tykkelse_mm = round(1000 * samlet_tykkelse_m)
+    
+    data = []
+    
+    # ------------------------
+    # PRODUCT NODE
+    # ------------------------
+    
     data.append({
         "Node": {
-            "Stage": {
-                "id": stage_ids[stage],
+            "Product": {
+                "id": produkt_ID,
                 "name": {
-                    "English": f"MBE wall {samlet_tykkelse_mm}mm ({stage})",
+                    "English": f"MBE wall {samlet_tykkelse_mm}mm",
                     "German": "",
                     "Norwegian": "",
-                    "Danish": f"MBE væg {samlet_tykkelse_mm}mm ({stage})"
-                },
+                    "Danish": f"MBE væg {samlet_tykkelse_mm}mm"
+                    },
                 "source": "User",
-                "valid_to": "2029-02-20",
-                "stage": stage,
-                "stage_unit": "M3",
-                "indicator_unit": "M3",
-                "stage_factor": 1.0,
-                "mass_factor": 2439.72,
-                "indicator_factor": 1.0,
-                "scale_factor": 1.0,
-                "external_source": "MBE Auto Generator",
-                "external_id": "",
-                "external_version": "",
-                "external_url": "",
-                "compliance": "A1",
-                "data_type": "Specific",
-                "indicators": {
-                    "GWP": float(gwp_value),
-                    "AP": 0.0,
-                    "EP": 0.0,
-                    "POCP": 0.0,
-                    "ADPE": 0.0,
-                    "ADPF": 0.0,
-                    "PENR": 0.0,
-                    "PER": 0.0,
-                    "ODP": 0.0,
-                    "SENR": 0.0,
-                    "SER": 0.0
+                "uncertainty_factor": 1.0
                 }
             }
+        })
+    
+    # ------------------------
+    # STAGE GENERATOR
+    # ------------------------
+    
+    stage_values = {
+        "A1to3": gwp_A1A3,
+        "C3": gwp_C3,
+        "C4": gwp_C4,
+        "D": gwp_D
         }
-    })
-
-    # ProductToStage edge
-    data.append({
-        "Edge": [
-            {
-                "ProductToStage": {
-                    "id": edge_ids[stage],
-                    "excluded_scenarios": [],
-                    "enabled": True
-                }
-            },
-            produkt_ID,
-            stage_ids[stage]
-        ]
-    })
-
-    # CategoryToStage edge (standard kategori-id beholdt)
-    data.append({
-        "Edge": [
-            {
-                "CategoryToStage": category_to_stage_ids[stage]
-            },
-            "1389423d-f9f7-490d-94c7-2ff87bfb9203",
-            stage_ids[stage]
-        ]
-    })
-
-# ------------------------
-# DOWNLOAD BUTTON
-# ------------------------
-
-json_string = json.dumps(data, indent=4, ensure_ascii=False)
-
-st.download_button(
-    label="Download LCAByg JSON",
-    data=json_string,
-    file_name=f"MBE_LCA_{samlet_tykkelse_mm}mm.txt",
-    mime="application/json"
-)
+    
+    for stage, gwp_value in stage_values.items():
         
+        # Stage node
+        data.append({
+            "Node": {
+                "Stage": {
+                    "id": stage_ids[stage],
+                    "name": {
+                        "English": f"MBE wall {samlet_tykkelse_mm}mm ({stage})",
+                        "German": "",
+                        "Norwegian": "",
+                        "Danish": f"MBE væg {samlet_tykkelse_mm}mm ({stage})"
+                        },
+                    "source": "User",
+                    "valid_to": "2029-02-20",
+                    "stage": stage,
+                    "stage_unit": "M3",
+                    "indicator_unit": "M3",
+                    "stage_factor": 1.0,
+                    "mass_factor": 2439.72,
+                    "indicator_factor": 1.0,
+                    "scale_factor": 1.0,
+                    "external_source": "MBE Auto Generator",
+                    "external_id": "",
+                    "external_version": "",
+                    "external_url": "",
+                    "compliance": "A1",
+                    "data_type": "Specific",
+                    "indicators": {
+                        "GWP": float(gwp_value),
+                        "AP": 0.0,
+                        "EP": 0.0,
+                        "POCP": 0.0,
+                        "ADPE": 0.0,
+                        "ADPF": 0.0,
+                        "PENR": 0.0,
+                        "PER": 0.0,
+                        "ODP": 0.0,
+                        "SENR": 0.0,
+                        "SER": 0.0
+                        }
+                    }
+                }
+            })
+
+        # ProductToStage edge
+        data.append({
+            "Edge": [
+                {
+                    "ProductToStage": {
+                        "id": edge_ids[stage],
+                        "excluded_scenarios": [],
+                        "enabled": True
+                        }
+                    },
+                produkt_ID,
+                stage_ids[stage]
+                ]
+            })
+        
+        # CategoryToStage edge (standard kategori-id beholdt)
+        data.append({
+            "Edge": [
+                {
+                    "CategoryToStage": category_to_stage_ids[stage]
+                    },
+                "1389423d-f9f7-490d-94c7-2ff87bfb9203",
+                stage_ids[stage]
+                ]
+            })
+        
+        # ------------------------
+        # DOWNLOAD BUTTON
+        # ------------------------
+        
+        json_string = json.dumps(data, indent=4, ensure_ascii=False)
+        
+        st.download_button(
+            label="Download LCAByg JSON",
+            data=json_string,
+            file_name=f"MBE_LCA_{samlet_tykkelse_mm}mm.txt",
+            mime="application/json"
+            )
+            
   
